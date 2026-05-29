@@ -1,0 +1,81 @@
+package ru.spb.skynet.lk.di
+
+import android.content.Context
+import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import okhttp3.Call
+import okhttp3.EventListener
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import ru.spb.skynet.lk.BuildConfig
+import ru.spb.skynet.lk.SkynetApp
+import ru.spb.skynet.lk.data.models.SkynetApi
+import java.io.IOException
+import java.util.concurrent.TimeUnit
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+
+    @Singleton
+    @Provides
+    fun provideApplication(@ApplicationContext context: Context): SkynetApp {
+        return context as SkynetApp
+    }
+
+    @Provides
+    @Singleton
+    fun provideGson(): Gson = GsonBuilder().create()
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+
+        val httpLoggingInterceptor = HttpLoggingInterceptor()
+        httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
+
+        val eventListener = object : EventListener() {
+            override fun callStart(call: Call) {
+                Log.d("Network", "📡 Запрос начат: ${call.request().url}")
+            }
+
+            override fun callEnd(call: Call) {
+                Log.d("Network", "✅ Запрос завершен: ${call.request().url}")
+            }
+
+            override fun callFailed(call: Call, ioe: IOException) {
+                Log.e("Network", "❌ Ошибка: ${ioe.message}", ioe)
+            }
+        }
+
+        return OkHttpClient.Builder()
+            .eventListener(eventListener)
+            .addNetworkInterceptor(httpLoggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .retryOnConnectionFailure(true)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient, gson: Gson): Retrofit = Retrofit.Builder()
+        .baseUrl(BuildConfig.API_URL)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create(gson))
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideSkynetApi(retrofit: Retrofit): SkynetApi = retrofit.create(SkynetApi::class.java)
+}

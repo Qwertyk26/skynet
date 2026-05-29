@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Мой Skynet</string>
+    <string name="auth_title">Введите\nномер телефона</string>
+    <string name="auth_title_contract">Введите\nномер договора</string>
+    <string name="contract_number">Номер договора</string>
+    <string name="password">Пароль</string>
+    <string name="auth_hint">Чтобы войти в личный кабинет Skynet</string>
+    <string name="phone_number">Номер телефона</string>
+    <string name="forgot_password_title">Укажите номер телефона, к которому привязан договор</string>
+    <string name="login">Войти</string>
+    <string name="next">Далее</string>
+    <string name="enter_pin">Введите пин</string>
+</resources>
