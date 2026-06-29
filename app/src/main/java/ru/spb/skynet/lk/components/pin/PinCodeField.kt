@@ -1,4 +1,5 @@
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,7 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -25,7 +29,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -46,10 +49,9 @@ fun PinCodeField(
     }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.wrapContentWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Скрытое поле ввода
         OutlinedTextField(
             value = code,
             onValueChange = { newValue ->
@@ -66,14 +68,13 @@ fun PinCodeField(
                 .height(1.dp)
                 .focusRequester(focusRequester),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            visualTransformation = PasswordVisualTransformation(), // маскируем звёздочками
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true,
-            textStyle = TextStyle(fontSize = 0.sp) // невидимый текст
+            textStyle = TextStyle(fontSize = 0.sp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Ряд с кружками
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -82,7 +83,7 @@ fun PinCodeField(
             repeat(length) { index ->
                 PinDigit(
                     digit = code.getOrNull(index)?.toString() ?: "",
-                    isActive = index == code.length
+                    isActive = code.isNotEmpty() && index == code.length // <-- исправлено
                 )
                 if (index < length - 1) {
                     Spacer(modifier = Modifier.width(16.dp))
@@ -102,14 +103,20 @@ private fun PinDigit(
         modifier = modifier
             .width(20.dp)
             .height(20.dp),
-        shape = RoundedCornerShape(10.dp),
-        color = if (isActive) SkynetGreen else Color.LightGray
+        shape = CircleShape,
+        color = Color.LightGray
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Text("●", color = Color.Transparent, fontSize = 24.sp)
+            if (digit.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .background(SkynetGreen, CircleShape)
+                )
+            }
         }
     }
 }

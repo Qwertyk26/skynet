@@ -4,15 +4,23 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
 import ru.spb.skynet.lk.data.models.SkynetApi
+import ru.spb.skynet.lk.data.models.request.pin_code.PinCodeRequest
 import ru.spb.skynet.lk.data.models.response.auth.AuthResponse
+import ru.spb.skynet.lk.data.models.response.pin_code.PinCodeResponse
 import javax.inject.Inject
 
 class AuthRepository @Inject constructor(private val skynetApi: SkynetApi) {
 
-    suspend fun login(login: String, password: String): Response<AuthResponse> {
+    suspend fun login(login: String, password: String? = null, verification: String? = null): Response<AuthResponse> {
         val action = "authorize".toRequestBody("text/plain".toMediaType())
         val login = login.toRequestBody("text/plain".toMediaType())
-        val password = password.toRequestBody("text/plain".toMediaType())
-        return skynetApi.login(action, login, password)
+        val password = password?.toRequestBody("text/plain".toMediaType())
+        val verification = verification?.toRequestBody("text/plain".toMediaType())
+
+        return skynetApi.login(action, login, password, verification)
+    }
+
+    suspend fun refresh(pinCodeRequest: PinCodeRequest): Response<PinCodeResponse> {
+        return skynetApi.refresh(pinCodeRequest)
     }
 }
