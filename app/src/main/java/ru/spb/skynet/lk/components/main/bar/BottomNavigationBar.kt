@@ -12,37 +12,47 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.spb.skynet.lk.data.models.components.bar.NavBarItems
+import ru.spb.skynet.lk.data.models.components.bar.NavRoutes
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
+
     NavigationBar(containerColor = Color.White) {
         val backStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = backStackEntry?.destination?.route
 
         NavBarItems.BarItems.forEach { navItem ->
+            val isSelected = currentRoute == navItem.route ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.Notifications.route) ||
+                    (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.ChangePinCode.route) ||
+                    (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.ChangePassword.route) ||
+                    (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.Sessions.route)
             NavigationBarItem(
-                selected = currentRoute == navItem.route,
+                selected = isSelected,
                 onClick = {
-                    navController.navigate(navItem.route) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
+                    if (currentRoute == NavRoutes.Notifications.route && navItem.route == NavRoutes.Home.route
+                        || currentRoute == NavRoutes.ChangePinCode.route && navItem.route == NavRoutes.Settings.route ||
+                        currentRoute == NavRoutes.ChangePassword.route && navItem.route == NavRoutes.Settings.route ||
+                        currentRoute == NavRoutes.Sessions.route && navItem.route == NavRoutes.Settings.route) {
+                        navController.popBackStack()
+                    } else if (currentRoute != navItem.route) {
+                        navController.navigate(navItem.route) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     }
                 },
                 icon = {
                     Icon(imageVector = navItem.image,
                         contentDescription = navItem.title)
                 },
-                label = {
-                    Text(text = navItem.title)
-                },
+                alwaysShowLabel = false,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.White,          // Цвет иконки при выборе
-                    unselectedIconColor = Color.Gray,        // Цвет иконки в пассивном состоянии
-                    selectedTextColor = SkynetGreen,          // Цвет текста при выборе
-                    unselectedTextColor = Color.Black,        // Цвет текста в пассивном состоянии
-                    indicatorColor = SkynetGreen       // Цвет "таблетки" вокруг активной иконки
+                    selectedIconColor = SkynetGreen,
+                    unselectedIconColor = Color.Gray,
+                    indicatorColor = Color.Transparent
                 )
             )
         }

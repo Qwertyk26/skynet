@@ -1,6 +1,7 @@
 package ru.spb.skynet.lk.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -18,6 +19,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import ru.spb.skynet.lk.BuildConfig
 import ru.spb.skynet.lk.SkynetApp
 import ru.spb.skynet.lk.data.models.SkynetApi
+import ru.spb.skynet.lk.tools.AuthInterceptor
+import ru.spb.skynet.lk.tools.SkyNetPreferences
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -34,11 +37,29 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideSkyNetPreferences(@ApplicationContext context: Context): SkyNetPreferences {
+        return SkyNetPreferences(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
+        return context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthInterceptor(tokenManager: SkyNetPreferences): AuthInterceptor {
+        return AuthInterceptor(tokenManager)
+    }
+
+    @Provides
+    @Singleton
     fun provideGson(): Gson = GsonBuilder().create()
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(@ApplicationContext context: Context): OkHttpClient {
+    fun provideOkHttpClient(@ApplicationContext context: Context, authInterceptor: AuthInterceptor): OkHttpClient {
 
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -60,6 +81,7 @@ object AppModule {
         return OkHttpClient.Builder()
             .eventListener(eventListener)
             .addNetworkInterceptor(httpLoggingInterceptor)
+            .addNetworkInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)

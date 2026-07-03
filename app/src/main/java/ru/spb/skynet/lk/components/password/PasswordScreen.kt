@@ -45,7 +45,7 @@ import ru.spb.skynet.lk.components.phone.PhoneNumber
 import ru.spb.skynet.lk.components.progress_bar.ProgressBar
 import ru.spb.skynet.lk.data.network.NetworkState
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
-import ru.spb.skynet.lk.viewModels.AuthViewModel
+import ru.spb.skynet.lk.viewModels.auth.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,7 +78,6 @@ fun PasswordScreen(navController: NavController, viewModel: AuthViewModel) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         Scaffold(
             topBar = {
                 TopAppBar(

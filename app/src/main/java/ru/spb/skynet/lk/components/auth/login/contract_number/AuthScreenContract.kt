@@ -54,7 +54,7 @@ import ru.spb.skynet.lk.components.progress_bar.ProgressBar
 import ru.spb.skynet.lk.data.network.NetworkState
 import ru.spb.skynet.lk.ui.theme.SkynetGray
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
-import ru.spb.skynet.lk.viewModels.AuthViewModel
+import ru.spb.skynet.lk.viewModels.auth.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +65,7 @@ fun AuthScreenContract(navController: NavController, viewModel: AuthViewModel) {
     var password by remember { mutableStateOf("") }
     var contractNumber by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
+    val abonent = viewModel.abonentState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.resetState()
@@ -73,8 +74,13 @@ fun AuthScreenContract(navController: NavController, viewModel: AuthViewModel) {
     LaunchedEffect(state) {
         when (state) {
             is NetworkState.Success -> {
-                navController.navigate("pin_code") {
-                    popUpTo("auth_phone") { inclusive = true }
+                if (abonent.value?.info?.hasPincode  == true) {
+                    navController.navigate("pin_code") {
+                        popUpTo("auth_phone") { inclusive = true }
+                    }
+                    navController.navigate("main") {
+                        popUpTo("auth_phone") { inclusive = true }
+                    }
                 }
             }
             is NetworkState.Error -> {

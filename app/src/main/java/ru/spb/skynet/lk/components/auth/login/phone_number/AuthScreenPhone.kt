@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,7 +51,7 @@ import ru.spb.skynet.lk.components.phone.PhoneNumber
 import ru.spb.skynet.lk.components.progress_bar.ProgressBar
 import ru.spb.skynet.lk.data.network.NetworkState
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
-import ru.spb.skynet.lk.viewModels.AuthViewModel
+import ru.spb.skynet.lk.viewModels.auth.AuthViewModel
 
 @Composable
 fun AuthScreenPhone(
@@ -62,8 +64,8 @@ fun AuthScreenPhone(
 
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val abonent = viewModel.abonentState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.resetState()
@@ -72,8 +74,13 @@ fun AuthScreenPhone(
     LaunchedEffect(state) {
         when (state) {
             is NetworkState.Success -> {
-                navController.navigate("pin_code") {
-                    popUpTo("auth_phone") { inclusive = true }
+                if (abonent.value?.info?.hasPincode  == true) {
+                    navController.navigate("pin_code") {
+                        popUpTo("auth_phone") { inclusive = true }
+                    }
+                    navController.navigate("main") {
+                        popUpTo("auth_phone") { inclusive = true }
+                    }
                 }
                 viewModel.resetState()
             }
@@ -91,11 +98,12 @@ fun AuthScreenPhone(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
-                .padding(top = 60.dp, start = 20.dp, end = 20.dp)
+                .statusBarsPadding()
+                .padding(20.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 Text(
-                    text = context.getString(R.string.auth_title),
+                    text = stringResource(R.string.auth_title),
                     color = Color.Black,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
@@ -104,7 +112,7 @@ fun AuthScreenPhone(
                 Spacer(modifier = Modifier.height(30.dp))
 
                 Text(
-                    text = context.getString(R.string.auth_hint),
+                    text = stringResource(R.string.auth_hint),
                     color = Color.Black,
                     fontWeight = FontWeight.Light
                 )
@@ -144,7 +152,7 @@ fun AuthScreenPhone(
                         viewModel.login(phoneNumber, password)
                     },
                 ) {
-                    Text(context.getString(R.string.login))
+                    Text(stringResource(R.string.login))
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))

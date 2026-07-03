@@ -68,6 +68,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,4 +91,7 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("androidx.compose.material:material:1.6.0")
+    implementation("com.valentinilk.shimmer:compose-shimmer:1.3.3")
 }
