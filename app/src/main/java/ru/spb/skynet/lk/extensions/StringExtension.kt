@@ -2,6 +2,7 @@ package ru.spb.skynet.lk.extensions
 
 import java.time.Instant
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -18,5 +19,25 @@ fun Int.toFormattedDate(
         instant.atZone(zoneId).format(formatter)
     } catch (e: Exception) {
         ""
+    }
+}
+
+fun String.parseCustomTimestamp(): String {
+    return try {
+        val parts = this.split("+")
+        val seconds = parts[0].toLong()
+        val zoneOffsetString = "+" + parts[1]
+
+        val instant = Instant.ofEpochSecond(seconds)
+
+        val offset = ZoneOffset.of(zoneOffsetString)
+
+        val dateTime = instant.atOffset(offset)
+
+        val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
+
+        dateTime.format(formatter)
+    } catch (e: Exception) {
+        this
     }
 }

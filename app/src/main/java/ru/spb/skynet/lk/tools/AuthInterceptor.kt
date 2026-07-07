@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 class AuthInterceptor(private val skyNetPreferences: SkyNetPreferences) : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
+
         val originalRequest = chain.request()
 
-        // Retrieve the token synchronously from DataStore
         val session = runBlocking { skyNetPreferences.sessionFlow.first() }
 
         val requestBuilder = originalRequest.newBuilder()
 
-        // Inject token if it exists
         if (!session.isNullOrEmpty()) {
             requestBuilder.addHeader("Cookie", session)
         }

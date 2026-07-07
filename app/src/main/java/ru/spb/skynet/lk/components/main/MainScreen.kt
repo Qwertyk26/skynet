@@ -12,19 +12,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import ru.spb.skynet.lk.components.bank_card.BankCardScreen
 import ru.spb.skynet.lk.components.chat.ChatScreen
 import ru.spb.skynet.lk.components.contacts.Contacts
 import ru.spb.skynet.lk.components.home.HomeScreen
 import ru.spb.skynet.lk.components.main.bar.BottomNavigationBar
 import ru.spb.skynet.lk.components.notifications.NotificationsScreen
 import ru.spb.skynet.lk.components.password.change.ChangePassword
+import ru.spb.skynet.lk.components.payments_history.PaymentsHistoryScreen
 import ru.spb.skynet.lk.components.pin.change.ChangePinCodeScreen
 import ru.spb.skynet.lk.components.sessions.SessionsScreen
 import ru.spb.skynet.lk.components.settings.SettingsScreen
 import ru.spb.skynet.lk.data.models.components.bar.NavRoutes
-import ru.spb.skynet.lk.viewModels.auth.AuthViewModel
+import ru.spb.skynet.lk.viewModels.bank_card.BankCardViewModel
 import ru.spb.skynet.lk.viewModels.home.HomeViewModel
 import ru.spb.skynet.lk.viewModels.notifications.NotificationsViewModel
+import ru.spb.skynet.lk.viewModels.payments_history.PaymentsHistoryViewModel
 import ru.spb.skynet.lk.viewModels.sessions.SessionsViewModel
 import ru.spb.skynet.lk.viewModels.settings.SettingsViewModel
 
@@ -35,6 +38,8 @@ fun MainScreen() {
     val sessionsViewModel: SessionsViewModel = hiltViewModel()
     val notificationsViewModel: NotificationsViewModel = hiltViewModel()
     val homeViewModel: HomeViewModel = hiltViewModel()
+    val paymentsViewModel: PaymentsHistoryViewModel = hiltViewModel()
+    val bankCardViewModel: BankCardViewModel = hiltViewModel()
 
     Column {
         NavHost(navController, startDestination = NavRoutes.Home.route,
@@ -52,6 +57,8 @@ fun MainScreen() {
             composable(NavRoutes.ChangePinCode.route) { ChangePinCodeScreen(navController = navController) }
             composable(NavRoutes.ChangePassword.route) { ChangePassword(navController = navController) }
             composable(NavRoutes.Sessions.route) { SessionsScreen(navController = navController, sessionsViewModel) }
+            composable(NavRoutes.PaymentsHistory.route) { PaymentsHistoryScreen(navController, paymentsViewModel) }
+            composable(NavRoutes.BanckCard.route) { BankCardScreen(navController, bankCardViewModel) }
         }
         HorizontalDivider(
             thickness = 0.5.dp,

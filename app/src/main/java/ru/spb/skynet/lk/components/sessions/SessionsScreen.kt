@@ -5,13 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items // Импортируем расширение items для работы со списками
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -28,14 +26,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import ru.spb.skynet.lk.R
+import ru.spb.skynet.lk.components.widgets.BlurLoadingIndicator
 import ru.spb.skynet.lk.data.network.NetworkState
+import ru.spb.skynet.lk.extensions.shimmer
 import ru.spb.skynet.lk.extensions.toFormattedDate
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
 import ru.spb.skynet.lk.viewModels.sessions.SessionsViewModel
@@ -85,19 +84,15 @@ fun SessionsScreen(navController: NavController, viewModel: SessionsViewModel) {
                     .background(Color.White)
             ) {
                 when (sessionsState) {
-                    // СОСТОЯНИЕ А: Загрузка данных
+
                     is NetworkState.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(56.dp)
-                                .align(Alignment.Center),
+                        BlurLoadingIndicator(
                             color = SkynetGreen,
-                            strokeWidth = 5.dp,
-                            strokeCap = StrokeCap.Round
+                            modifier = Modifier
                         )
                     }
 
-                    // СОСТОЯНИЕ Б: Ошибка сети
+
                     is NetworkState.Error -> {
                         Text(
                             text = stringResource(R.string.empty),
@@ -106,7 +101,6 @@ fun SessionsScreen(navController: NavController, viewModel: SessionsViewModel) {
                         )
                     }
 
-                    // СОСТОЯНИЕ В: Успех
                     is NetworkState.Success -> {
                         if (sessionsList?.data.isNullOrEmpty()) {
                             Text(
@@ -120,13 +114,15 @@ fun SessionsScreen(navController: NavController, viewModel: SessionsViewModel) {
                                 items(sessionsList?.data ?: emptyList(),  key = { session -> session?.id ?: session.hashCode() } ) { session ->
                                     ListItem(
                                         headlineContent = {
-                                            Text(session?.useragent ?: "")
+                                            Text(session?.useragent ?: "", modifier = Modifier.shimmer(12.dp, isLoading = sessionsState is NetworkState.Loading))
                                         },
                                         supportingContent = {
-                                            Text(session?.updatedAt?.toFormattedDate() ?: "")
+                                            Text(session?.updatedAt?.toFormattedDate() ?: "", modifier = Modifier.shimmer(12.dp, isLoading = sessionsState is NetworkState.Loading))
                                         },
                                         trailingContent = {
-                                            IconButton(onClick = { /* viewModel.closeSession(session.id) */ }) {
+                                            IconButton(onClick = {
+
+                                            }, modifier = Modifier.shimmer(12.dp, isLoading = sessionsState is NetworkState.Loading)) {
                                                 Icon(
                                                     imageVector = Icons.Default.Delete,
                                                     contentDescription = null,
@@ -149,7 +145,6 @@ fun SessionsScreen(navController: NavController, viewModel: SessionsViewModel) {
                             }
                         }
                     }
-
                     else -> Unit
                 }
             }

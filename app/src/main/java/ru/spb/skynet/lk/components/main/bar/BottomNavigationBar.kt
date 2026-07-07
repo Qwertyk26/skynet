@@ -4,12 +4,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import ru.spb.skynet.lk.data.models.components.bar.NavBarItems
 import ru.spb.skynet.lk.data.models.components.bar.NavRoutes
@@ -27,14 +25,18 @@ fun BottomNavigationBar(navController: NavController) {
                     (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.Notifications.route) ||
                     (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.ChangePinCode.route) ||
                     (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.ChangePassword.route) ||
-                    (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.Sessions.route)
+                    (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.Sessions.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.PaymentsHistory.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.BanckCard.route)
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
                     if (currentRoute == NavRoutes.Notifications.route && navItem.route == NavRoutes.Home.route
                         || currentRoute == NavRoutes.ChangePinCode.route && navItem.route == NavRoutes.Settings.route ||
                         currentRoute == NavRoutes.ChangePassword.route && navItem.route == NavRoutes.Settings.route ||
-                        currentRoute == NavRoutes.Sessions.route && navItem.route == NavRoutes.Settings.route) {
+                        currentRoute == NavRoutes.Sessions.route && navItem.route == NavRoutes.Settings.route ||
+                        currentRoute == NavRoutes.PaymentsHistory.route && navItem.route == NavRoutes.Home.route ||
+                        currentRoute == NavRoutes.BanckCard.route && navItem.route == NavRoutes.Home.route) {
                         navController.popBackStack()
                     } else if (currentRoute != navItem.route) {
                         navController.navigate(navItem.route) {

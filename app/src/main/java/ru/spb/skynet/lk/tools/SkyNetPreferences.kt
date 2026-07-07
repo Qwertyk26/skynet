@@ -14,6 +14,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SkyNetPreferences@Inject constructor(@ApplicationContext private val context: Context) {
+
     companion object {
         private val Context.dataStore by preferencesDataStore(name = BuildConfig.APPLICATION_ID)
         private val GENESIS_SESSION_REFRESH = stringPreferencesKey("GenesisSessionRefresh")

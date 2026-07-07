@@ -3,8 +3,10 @@ package ru.spb.skynet.lk.components.notifications
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,7 +42,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import ru.spb.skynet.lk.R
+import ru.spb.skynet.lk.components.widgets.BlurLoadingIndicator
 import ru.spb.skynet.lk.data.network.NetworkState
+import ru.spb.skynet.lk.extensions.shimmer
 import ru.spb.skynet.lk.extensions.toFormattedDate
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
 import ru.spb.skynet.lk.viewModels.notifications.NotificationsViewModel
@@ -92,19 +96,15 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                     .fillMaxSize()
                     .background(Color.White)
             ) {
-                // СЦЕНАРИЙ 1: ПЕРВИЧНАЯ ЗАГРУЗКА (Экран пустой, показываем большую крутилку по центру)
                 if (isRefreshing && itemsList.isEmpty()) {
-                    CircularProgressIndicator(
+                    BlurLoadingIndicator(
                         modifier = Modifier
                             .size(56.dp)
                             .padding(innerPadding)
                             .align(Alignment.Center),
-                        color = SkynetGreen,
-                        strokeWidth = 5.dp,
-                        strokeCap = StrokeCap.Round
+                        color = SkynetGreen
                     )
                 }
-                // СЦЕНАРИЙ 2: ОШИБКА НА ПЕРВОМ СТАРТЕ (И данных в памяти нет)
                 else if (networkState is NetworkState.Error && itemsList.isEmpty()) {
                     Text(
                         text = stringResource(R.string.empty),
@@ -121,7 +121,6 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                             color = Color.Gray
                         )
                     } else {
-                        // Кастомный контейнер свайпа для обновления
                         PullToRefreshBox(
                             isRefreshing = isRefreshing,
                             onRefresh = { viewModel.refreshNotifications() },
@@ -143,11 +142,9 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                             ) {
                                 itemsIndexed(
                                     items = itemsList,
-                                    // Уникальный ключ защищает от визуальных миганий строк при обновлении
                                     key = { _, item -> item.id ?: item.hashCode() }
                                 ) { index, notificationItem ->
 
-                                    // ТРИГГЕР ПАГИНАЦИИ: За 3 элемента до конца списка запрашиваем новую страницу
                                     LaunchedEffect(index) {
                                         if (index >= itemsList.size - 3) {
                                             viewModel.notifications()
@@ -157,16 +154,23 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                                     if (notificationItem != null) {
                                         ListItem(
                                             headlineContent = {
-                                                Text(
-                                                    text = notificationItem.message ?: "",
-                                                    color = Color.Black
-                                                )
+                                                Column() {
+                                                    Text(
+                                                        modifier = Modifier.shimmer(12.dp)
+                                                            .padding(),
+                                                        text = notificationItem.message ?: "",
+                                                        color = Color.Black
+                                                    )
+                                                    Spacer(modifier = Modifier.height(5.dp))
+                                                    Text(
+                                                        modifier = Modifier.shimmer(12.dp),
+                                                        text = notificationItem.timestampDelivery?.toFormattedDate() ?: "",
+                                                        color = Color.Gray
+                                                    )
+                                                }
                                             },
                                             supportingContent = {
-                                                Text(
-                                                    text = notificationItem.timestampDelivery?.toFormattedDate() ?: "",
-                                                    color = Color.Gray
-                                                )
+
                                             },
                                             colors = ListItemDefaults.colors(
                                                 containerColor = Color.White,
@@ -182,7 +186,6 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                                     }
                                 }
 
-                                // Маленький нижний лоадер, показывающийся при пагинации на доскролле
                                 if (isRefreshing && itemsList.isNotEmpty()) {
                                     item {
                                         Box(
@@ -191,9 +194,10 @@ fun NotificationsScreen(navController: NavController, viewModel: NotificationsVi
                                                 .padding(16.dp),
                                             contentAlignment = Alignment.Center
                                         ) {
-                                            CircularProgressIndicator(
+                                            BlurLoadingIndicator(
                                                 modifier = Modifier.size(32.dp),
-                                                color = SkynetGreen,strokeWidth = 3.dp)
+                                                color = SkynetGreen
+                                            )
                                         }
                                     }
                                 }

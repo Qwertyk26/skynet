@@ -18,6 +18,7 @@ import ru.spb.skynet.lk.components.auth.login.phone_number.AuthScreenPhone
 import ru.spb.skynet.lk.components.greeting.GreetingScreen
 import ru.spb.skynet.lk.components.main.MainScreen
 import ru.spb.skynet.lk.components.password.PasswordScreen
+import ru.spb.skynet.lk.components.payments_history.PaymentsHistoryScreen
 import ru.spb.skynet.lk.components.pin.PinCodeScreen
 import ru.spb.skynet.lk.components.sms.SmsScreen
 import ru.spb.skynet.lk.tools.SkyNetPreferences

@@ -30,44 +30,33 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
     fun login(phoneNumber: String, password: String? = null, verification: String? = null) {
         viewModelScope.launch {
-            // 1. Включаем общую крутилку прогресс-бара на экране
             _loginState.value = NetworkState.Loading
-
             try {
-                // ШАГ А: Запуск первого запроса авторизации
                 val loginResult = authRepository.login(phoneNumber, password, verification = verification)
 
                 if (loginResult.isSuccessful) {
-                    // Сохраняем сессию/куки из заголовков успешного входа
                     val cookie = loginResult.headers()["Set-cookie"] ?: ""
                     skyNetPreferences.saveSession(cookie)
 
                     Log.d(AuthViewModel::class.simpleName, "Логин успешен. Запуск запроса abonent...")
 
-                    // ШАГ Б: Запуск второго запроса (вызывается строго ПОСЛЕ логина)
                     val abonentResult = authRepository.abonent()
 
                     if (abonentResult.isSuccessful) {
-                        // ОБА запроса выполнены успешно. Переводим экран в финальный NetworkState.Success.
-                        // Передаем abonentResult (или loginResult, в зависимости от того, какие данные нужны экрану дальше)
                         _abonentState.value = abonentResult.body()
                         _loginState.value = NetworkState.Success(abonentResult)
                         Log.d(AuthViewModel::class.simpleName, "Данные абонента успешно получены!")
                     } else {
-                        // Ошибка на шаге запроса абонента
                         val errorResponse = Gson().fromJson(abonentResult.errorBody()?.string(), AuthResponse::class.java)
                         _loginState.value = NetworkState.Error("Ошибка получения данных абонента: ${errorResponse.resultDesc}")
                     }
-
                 } else {
-                    // Ошибка на шаге самого логина
                     val errorResponse = Gson().fromJson(loginResult.errorBody()?.string(), AuthResponse::class.java)
                     Log.d(AuthViewModel::class.simpleName, errorResponse.resultDesc ?: "")
                     _loginState.value = NetworkState.Error("Ошибка авторизации: ${errorResponse.resultDesc}")
                 }
 
             } catch (e: Exception) {
-                // Перехват любых сетевых таймаутов или сбоев парсинга обоих запросов
                 _loginState.value = NetworkState.Error(e.message ?: "Network error")
             }
         }
@@ -79,8 +68,8 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
     fun refresh(pinCodeRequest: PinCodeRequest) {
         viewModelScope.launch {
+            _loginState.value = NetworkState.Loading
             try {
-                _loginState.value = NetworkState.Loading
                 val result = authRepository.refresh(pinCodeRequest)
                 if (result.body()?.result?.equals(ERROR) == true) {
                     _loginState.value = NetworkState.Error(result.body()?.resultCode ?: "")
@@ -93,8 +82,6 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
             }
         }
     }
-
-
     companion object {
         const val ERROR = "error"
     }

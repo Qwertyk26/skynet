@@ -24,26 +24,34 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +72,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,12 +80,16 @@ import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.spb.skynet.lk.R
+import ru.spb.skynet.lk.components.balance.BalanceBottomSheet
 import ru.spb.skynet.lk.data.network.NetworkState
-import ru.spb.skynet.lk.extensions.shimmerIf
+import ru.spb.skynet.lk.extensions.shimmer
 import ru.spb.skynet.lk.ui.theme.SkynetGreen
 import ru.spb.skynet.lk.ui.theme.SkynetYellow
 import ru.spb.skynet.lk.viewModels.home.HomeViewModel
+import java.util.Locale
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
@@ -88,9 +101,15 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 
     val abonent by viewModel.abonent.collectAsStateWithLifecycle()
     val networkState by viewModel.networkState.collectAsStateWithLifecycle()
+    val pos by viewModel.pos.collectAsStateWithLifecycle()
 
     val pullToRefreshState = rememberPullToRefreshState()
     val isRefreshing = networkState is NetworkState.Loading
+    var isHidden by remember { mutableStateOf(false) }
+
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.abonent()
@@ -105,7 +124,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
     }
 
     val headerHeightDp = (configuration.screenHeightDp * 0.85f).dp
-    val maxSheetOffsetDp = headerHeightDp / 2.2f // Твоя исходная точка шторки
+    val maxSheetOffsetDp = headerHeightDp / 2.2f
 
     val statusBarHeightPx = WindowInsets.statusBars.asPaddingValues(density).calculateTopPadding().value * density.density
     val headerHeightPx = headerHeightDp.value * density.density
@@ -169,27 +188,32 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Button(
-                        onClick = { navController.navigate("notifications") },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                        contentPadding = PaddingValues(0.dp),
+                    Text(
+                        modifier = Modifier.weight(1f).padding(start = 20.dp, end = 20.dp).shimmer(12.dp, isLoading = networkState is NetworkState.Loading),
+                        color = Color.White,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        text = "${pos?.pos?.first()?.address} ,${ pos?.pos?.first()?.locationFlat}, ${"этаж."} ${ pos?.pos?.first()?.locationFloor}"
+                    )
+                    IconButton(
+                        onClick = { navController.navigate("notifications") }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Notifications,
                             contentDescription = null,
+                            tint = Color.White,
                             modifier = Modifier.size(25.dp)
                         )
                     }
                 }
 
                 Text(
-                    text = "${"Счет № ${abonent?.info?.userId}"} ",
+                    text = if (networkState is NetworkState.Loading) { "" } else { "${"Счет № ${abonent?.info?.userId}"} " },
                     color = Color.White,
                     modifier = Modifier
-                        .shimmerIf(networkState is NetworkState.Loading)
-                        .background(Color.Gray, CircleShape)
+                        .shimmer(12.dp, networkState is NetworkState.Loading)
                         .border(1.dp, Color.White.copy(alpha = 0.5f), CircleShape)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 )
@@ -201,19 +225,41 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                     fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-
-                    )
-                Text(
-                    text = "${abonent?.info?.money} ₽",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 34.sp,
-                    color = Color.White
+                    modifier = Modifier.shimmer(12.dp, networkState is NetworkState.Loading)
                 )
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(modifier = Modifier.wrapContentSize()) {
+                    val moneyAmount = abonent?.info?.money?.toDoubleOrNull() ?: 0.0
+                    val formattedMoney = String.format(Locale.getDefault(), "%.2f", moneyAmount)
+                    val displayText = if (!isHidden) {
+                        "$formattedMoney₽"
+                    } else {
+                        "••••₽"
+                    }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        text = displayText,
+                        modifier = Modifier.shimmer(12.dp, networkState is NetworkState.Loading),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 34.sp,
+                        color = Color.White
+                    )
+                    IconToggleButton(
+                        checked = isHidden,
+                        onCheckedChange = {
+                            isHidden = it
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (isHidden) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = null,
+                            tint = Color.White
+                        )
+                    }
+                }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.wrapContentSize().shimmer(12.dp, isLoading = networkState is NetworkState.Loading),
                     horizontalArrangement = Arrangement.spacedBy(
                         12.dp,
                         Alignment.CenterHorizontally
@@ -228,7 +274,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                         Image(
                             painter = painterResource(R.drawable.ic_promised),
                             contentDescription = null,
-                            modifier = Modifier.size(32.dp), // Добавлен размер
+                            modifier = Modifier.size(32.dp),
                             colorFilter = ColorFilter.tint(Color.White)
                         )
                     }
@@ -259,8 +305,12 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(5.dp))
                 Button(
-                    onClick = {},
+                    onClick = {
+                        showBottomSheet = true
+                    },
+                    modifier = Modifier.shimmer(12.dp, isLoading = networkState is NetworkState.Loading),
                     shape = RoundedCornerShape(12.dp),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = SkynetYellow)
@@ -318,11 +368,13 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Ваши услуги",
+                    modifier = Modifier.shimmer(12.dp),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -330,7 +382,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                     items(5) { index ->
                         Text(
                             text = "Услуга ${index + 1}",
-                            modifier = Modifier.fillMaxWidth().background(
+                            modifier = Modifier.fillMaxWidth().shimmer(12.dp).background(
                                 Color.LightGray.copy(alpha = 0.4f),
                                 RoundedCornerShape(8.dp)
                             ).padding(12.dp),
@@ -340,6 +392,39 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
                     item { Spacer(modifier = Modifier.height(32.dp)) }
                 }
             }
+        }
+    }
+    if (showBottomSheet) {
+        ModalBottomSheet(
+            onDismissRequest = { showBottomSheet = false },
+
+            sheetState = sheetState,
+            containerColor = Color.White,
+            dragHandle = {}
+        ) {
+
+            BalanceBottomSheet(
+                navController = navController,
+                onClose = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                            navController.navigate("payments_history")
+                        }
+                    }
+                },
+                onNavigate = { route ->
+                    scope.launch {
+                        sheetState.hide()
+                    }.invokeOnCompletion {
+
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                            navController.navigate(route)
+                        }
+                    }
+                }
+            )
         }
     }
 }

@@ -9,4 +9,6 @@ sealed class NavRoutes(val route: String) {
     object ChangePinCode: NavRoutes("change_pin")
     object ChangePassword: NavRoutes("change_password")
     object Sessions: NavRoutes("active_sessions")
+    object PaymentsHistory: NavRoutes("payments_history")
+    object BanckCard: NavRoutes("bank_card")
 }

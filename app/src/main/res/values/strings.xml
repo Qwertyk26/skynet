@@ -46,4 +46,15 @@
     <string name="repeat_password">Повторить пароль</string>
     <string name="save">Сохранить</string>
     <string name="password_not_same">Пароли не совпадают</string>
+    <string name="balance_and_payments">Баланс и платежи</string>
+    <string name="spb">Система быстрых платежей</string>
+    <string name="card">Банковская карта</string>
+    <string name="sber_pay">SberPay</string>
+    <string name="deferred_payment">Отложенный платеж</string>
+    <string name="card_operations">Операции по картам</string>
+    <string name="payment_history">Истрия платежей</string>
+    <string name="check">Чеки</string>
+    <string name="top_up_card">Пополнение банковской картой</string>
+    <string name="new_card">Пополнить новой картой</string>
+    <string name="auto_pay">Включен\nавтоплатеж</string>
 </resources>

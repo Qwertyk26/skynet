@@ -12,9 +12,12 @@ import ru.spb.skynet.lk.data.models.request.pin_code.PinCodeRequest
 import ru.spb.skynet.lk.data.models.response.abonent.AbonentResponse
 import ru.spb.skynet.lk.data.models.response.auth.AuthResponse
 import ru.spb.skynet.lk.data.models.response.notifications.NotificationResponse
+import ru.spb.skynet.lk.data.models.response.payments_history.PaymentsHistoryResponse
 import ru.spb.skynet.lk.data.models.response.pin_code.PinCodeResponse
+import ru.spb.skynet.lk.data.models.response.pos.PosResponse
 import ru.spb.skynet.lk.data.models.response.sessions.SessionsResponse
 import ru.spb.skynet.lk.data.models.response.settings.SettingsResponse
+import ru.spb.skynet.lk.data.models.response.tokens.TokensResponse
 
 interface SkynetApi {
 
@@ -37,8 +40,20 @@ interface SkynetApi {
     suspend fun sessions(): Response<SessionsResponse>
 
     @GET("notifications")
-    suspend fun notifications(@Query("page_limit") pageLimit: Int, @Query("offset") offset: Int): Response<NotificationResponse>
+    suspend fun notifications(
+        @Query("page_limit") pageLimit: Int,
+        @Query("offset") offset: Int
+    ): Response<NotificationResponse>
 
     @GET("abonent")
     suspend fun abonent(): Response<AbonentResponse>
+
+    @GET("payments")
+    suspend fun payments(): Response<PaymentsHistoryResponse>
+
+    @GET("pos")
+    suspend fun pos(): Response<PosResponse>
+
+    @GET("payments/tokens")
+    suspend fun card(): Response<TokensResponse>
 }
