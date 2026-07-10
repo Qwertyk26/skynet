@@ -1,7 +1,7 @@
 package ru.spb.skynet.lk.data.repository.notifications
 
 import retrofit2.Response
-import ru.spb.skynet.lk.data.models.SkynetApi
+import ru.spb.skynet.lk.data.SkynetApi
 import ru.spb.skynet.lk.data.models.response.notifications.NotificationResponse
 import javax.inject.Inject
 

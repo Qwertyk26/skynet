@@ -1,14 +1,11 @@
 package ru.spb.skynet.lk.components.balance
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -19,27 +16,25 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import ru.spb.skynet.lk.R
 
 @Composable
-fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
-                       onNavigate: (navRout: String) -> Unit) {
+fun BalanceBottomSheet(
+    onClose: () -> Unit,
+    onNavigate: (navRout: String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White)
     ) {
-        // Шапка шторки
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -48,6 +43,7 @@ fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
         ) {
             Text(
                 text = stringResource(R.string.balance_and_payments),
+
                 fontWeight = FontWeight.Bold,
                 fontSize = 20.sp
             )
@@ -68,45 +64,13 @@ fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
             }
         }
 
-        // Контент списка кнопок
         Column(
             modifier = Modifier
                 .padding(24.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // Кнопка СБП
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { /* Действие по клику */ },
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.Black,
-                    containerColor = Color.Transparent
-                )
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_spb),
-                        modifier = Modifier
-                            .size(36.dp)
-                            .align(Alignment.CenterStart),
-                        contentDescription = null
-                    )
-                    Text(
-                        text = stringResource(R.string.spb),
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
-
-            // Кнопка Карта
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -119,18 +83,6 @@ fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
             }
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
 
-            // Кнопка SberPay
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                onClick = {},
-                colors = ButtonDefaults.buttonColors(contentColor = Color.Black, containerColor = Color.Transparent)
-            ) {
-                Text(text = stringResource(R.string.sber_pay))
-            }
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
-
-            // Обещанный платеж
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -141,18 +93,18 @@ fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
             }
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
 
-            // Операции по картам
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                onClick = {},
+                onClick = {
+                    onNavigate("orders")
+                },
                 colors = ButtonDefaults.buttonColors(contentColor = Color.Black, containerColor = Color.Transparent)
             ) {
                 Text(text = stringResource(R.string.card_operations))
             }
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
 
-            // ИСПРАВЛЕННАЯ КНОПКА: История платежей с плавной анимацией
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -168,11 +120,12 @@ fun BalanceBottomSheet(navController: NavController, onClose: () -> Unit,
             }
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f), thickness = 0.5.dp)
 
-            // Кнопка Чек
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                onClick = {},
+                onClick = {
+                    onNavigate("checks")
+                },
                 colors = ButtonDefaults.buttonColors(contentColor = Color.Black, containerColor = Color.Transparent)
             ) {
                 Text(text = stringResource(R.string.check))

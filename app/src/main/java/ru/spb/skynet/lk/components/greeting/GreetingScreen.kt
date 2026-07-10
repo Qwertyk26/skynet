@@ -98,7 +98,11 @@ fun GreetingScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         delay(2000)
-        navController.navigate("main")
+        navController.navigate("main") {
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
+            }
+        }
     }
 
     Column(

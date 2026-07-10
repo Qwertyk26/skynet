@@ -39,7 +39,7 @@ class SkyNetPreferences@Inject constructor(@ApplicationContext private val conte
         }
     }
 
-    suspend fun cleaSession() {
+    suspend fun clearSession() {
         context.dataStore.edit { preferences ->
             preferences.remove(GENESIS_SESSION_REFRESH)
         }

@@ -27,7 +27,11 @@ fun BottomNavigationBar(navController: NavController) {
                     (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.ChangePassword.route) ||
                     (navItem.route == NavRoutes.Settings.route && currentRoute == NavRoutes.Sessions.route) ||
                     (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.PaymentsHistory.route) ||
-                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.BanckCard.route)
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.BankCard.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.Orders.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.Checks.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.CashReceipt.route) ||
+                    (navItem.route == NavRoutes.Home.route && currentRoute == NavRoutes.Chat.route)
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
@@ -36,8 +40,12 @@ fun BottomNavigationBar(navController: NavController) {
                         currentRoute == NavRoutes.ChangePassword.route && navItem.route == NavRoutes.Settings.route ||
                         currentRoute == NavRoutes.Sessions.route && navItem.route == NavRoutes.Settings.route ||
                         currentRoute == NavRoutes.PaymentsHistory.route && navItem.route == NavRoutes.Home.route ||
-                        currentRoute == NavRoutes.BanckCard.route && navItem.route == NavRoutes.Home.route) {
-                        navController.popBackStack()
+                        currentRoute == NavRoutes.BankCard.route && navItem.route == NavRoutes.Home.route ||
+                        currentRoute == NavRoutes.Orders.route && navItem.route == NavRoutes.Home.route ||
+                        currentRoute == NavRoutes.Checks.route && navItem.route == NavRoutes.Home.route ||
+                        currentRoute == NavRoutes.CashReceipt.route && navItem.route == NavRoutes.Home.route ||
+                        currentRoute == NavRoutes.Chat.route && navItem.route == NavRoutes.Home.route) {
+                            navController.popBackStack()
                     } else if (currentRoute != navItem.route) {
                         navController.navigate(navItem.route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }

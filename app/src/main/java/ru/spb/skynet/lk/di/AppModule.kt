@@ -10,6 +10,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import okhttp3.Call
 import okhttp3.EventListener
 import okhttp3.OkHttpClient
@@ -18,7 +20,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.spb.skynet.lk.BuildConfig
 import ru.spb.skynet.lk.SkynetApp
-import ru.spb.skynet.lk.data.models.SkynetApi
+import ru.spb.skynet.lk.data.SkynetApi
+import ru.spb.skynet.lk.navigation.AppNavigator
 import ru.spb.skynet.lk.tools.AuthInterceptor
 import ru.spb.skynet.lk.tools.SkyNetPreferences
 import java.io.IOException
@@ -28,6 +31,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    fun provideCoroutineScope(): CoroutineScope = CoroutineScope(Dispatchers.Main)
 
     @Singleton
     @Provides
@@ -49,8 +55,11 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthInterceptor(tokenManager: SkyNetPreferences): AuthInterceptor {
-        return AuthInterceptor(tokenManager)
+    fun provideAuthInterceptor(
+        skyNetPreferences: SkyNetPreferences,
+        coroutineScope: CoroutineScope
+    ): AuthInterceptor {
+        return AuthInterceptor(skyNetPreferences, coroutineScope)
     }
 
     @Provides
@@ -59,7 +68,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(@ApplicationContext context: Context, authInterceptor: AuthInterceptor): OkHttpClient {
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient {
 
         val httpLoggingInterceptor = HttpLoggingInterceptor()
         httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY

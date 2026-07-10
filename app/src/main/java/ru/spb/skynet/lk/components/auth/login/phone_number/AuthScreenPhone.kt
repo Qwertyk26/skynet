@@ -65,7 +65,7 @@ fun AuthScreenPhone(
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val abonent = viewModel.abonentState.collectAsStateWithLifecycle()
+    val abonent by viewModel.abonentState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.resetState()
@@ -74,12 +74,18 @@ fun AuthScreenPhone(
     LaunchedEffect(state) {
         when (state) {
             is NetworkState.Success -> {
-                if (abonent.value?.info?.hasPincode  == true) {
+                if (abonent?.info?.hasPincode  == true) {
                     navController.navigate("pin_code") {
-                        popUpTo("auth_phone") { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
                     }
+                } else {
                     navController.navigate("main") {
                         popUpTo("auth_phone") { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
                     }
                 }
                 viewModel.resetState()
@@ -93,7 +99,6 @@ fun AuthScreenPhone(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Основной контент
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -193,7 +198,6 @@ fun AuthScreenPhone(
             }
         }
 
-        // Snackbar сверху
         SkynetSnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier
@@ -207,7 +211,6 @@ fun AuthScreenPhone(
         )
     }
 
-    // Прогресс-бар поверх всего
     if (state is NetworkState.Loading) {
         ProgressBar()
     }

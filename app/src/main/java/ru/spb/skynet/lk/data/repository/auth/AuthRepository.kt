@@ -3,7 +3,7 @@ package ru.spb.skynet.lk.data.repository.auth
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import retrofit2.Response
-import ru.spb.skynet.lk.data.models.SkynetApi
+import ru.spb.skynet.lk.data.SkynetApi
 import ru.spb.skynet.lk.data.models.request.pin_code.PinCodeRequest
 import ru.spb.skynet.lk.data.models.response.abonent.AbonentResponse
 import ru.spb.skynet.lk.data.models.response.auth.AuthResponse
@@ -19,10 +19,6 @@ class AuthRepository @Inject constructor(private val skynetApi: SkynetApi) {
         val verification = verification?.toRequestBody("text/plain".toMediaType())
 
         return skynetApi.login(action, login, password, verification)
-    }
-
-    suspend fun refresh(pinCodeRequest: PinCodeRequest): Response<PinCodeResponse> {
-        return skynetApi.refresh(pinCodeRequest)
     }
 
     suspend fun abonent(): Response<AbonentResponse> {

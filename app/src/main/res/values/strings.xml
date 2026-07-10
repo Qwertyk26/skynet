@@ -47,7 +47,7 @@
     <string name="save">Сохранить</string>
     <string name="password_not_same">Пароли не совпадают</string>
     <string name="balance_and_payments">Баланс и платежи</string>
-    <string name="spb">Система быстрых платежей</string>
+    <string name="sbp">Система быстрых платежей</string>
     <string name="card">Банковская карта</string>
     <string name="sber_pay">SberPay</string>
     <string name="deferred_payment">Отложенный платеж</string>
@@ -56,5 +56,14 @@
     <string name="check">Чеки</string>
     <string name="top_up_card">Пополнение банковской картой</string>
     <string name="new_card">Пополнить новой картой</string>
-    <string name="auto_pay">Включен\nавтоплатеж</string>
+    <string name="auto_pay">Автоплатеж</string>
+    <string name="write_off_amount">Сумма списание</string>
+    <string name="error_min_amount">Мин. 10₽</string>
+    <string name="top_up_button_title">Пополнить</string>
+    <string name="connect_card">Привязаять карту и пополнять счет автоматически</string>
+    <string name="chat_title">Чат с оператором Skynet</string>
+    <string name="cash_receipt">Кассовый чек</string>
+    <string name="services">Услуги</string>
+    <string name="services_subtitle">Доступные для подключения по адресу, указанном выше</string>
+    <string name="news">Новости</string>
 </resources>

@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
 import dagger.hilt.android.AndroidEntryPoint
 import ru.spb.skynet.lk.navigation.AppNavigation
+import ru.spb.skynet.lk.navigation.AppNavigator
 import ru.spb.skynet.lk.tools.SkyNetPreferences
 import javax.inject.Inject
 

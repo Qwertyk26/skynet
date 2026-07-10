@@ -66,22 +66,7 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         _loginState.value = NetworkState.Idle
     }
 
-    fun refresh(pinCodeRequest: PinCodeRequest) {
-        viewModelScope.launch {
-            _loginState.value = NetworkState.Loading
-            try {
-                val result = authRepository.refresh(pinCodeRequest)
-                if (result.body()?.result?.equals(ERROR) == true) {
-                    _loginState.value = NetworkState.Error(result.body()?.resultCode ?: "")
-                } else {
-                    _loginState.value = NetworkState.Success(result)
-                }
-            } catch (e: Exception) {
-                Log.d(AuthViewModel::class.simpleName, e.message ?: "")
-                _loginState.value = NetworkState.Error(e.message ?: "Network error")
-            }
-        }
-    }
+
     companion object {
         const val ERROR = "error"
     }

@@ -43,15 +43,16 @@ import ru.spb.skynet.lk.components.widgets.CustomPinKeyboard
 import ru.spb.skynet.lk.data.models.request.pin_code.PinCodeRequest
 import ru.spb.skynet.lk.data.network.NetworkState
 import ru.spb.skynet.lk.viewModels.auth.AuthViewModel
+import ru.spb.skynet.lk.viewModels.pin_code.PinCodeViewModel
 import ru.spb.skynet.lk.viewModels.settings.SettingsViewModel
 
 @Composable
 fun PinCodeScreen(
     navController: NavController,
-    viewModel: AuthViewModel,
+    viewModel: PinCodeViewModel,
     settingsViewModel: SettingsViewModel
 ) {
-    val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    val loginState by viewModel.networkState.collectAsStateWithLifecycle()
     val state = loginState
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -73,7 +74,9 @@ fun PinCodeScreen(
                 activity = activity,
                 onSuccess = {
                     navController.navigate("greeting") {
-                        popUpTo("pin_code") { inclusive = true }
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
                     }
                 },
                 onError = { errorMessage ->
@@ -93,12 +96,10 @@ fun PinCodeScreen(
                 navController.navigate("greeting") {
                     popUpTo("pin_code") { inclusive = true }
                 }
-                viewModel.resetState()
             }
             is NetworkState.Error -> {
                 snackBarHostState.showSnackbar(state.message)
-                pinCodeInput = "" // Автоматически очищаем неверный пин при ошибке
-                viewModel.resetState()
+                pinCodeInput = ""
             }
             else -> {}
         }

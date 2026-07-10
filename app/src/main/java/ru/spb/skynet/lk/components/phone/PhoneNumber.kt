@@ -93,7 +93,6 @@ fun PhoneNumber(onValueChange: (String) -> Unit) {
             TextField(
                 value = phoneNumber,
                 onValueChange = {
-                    // Remove non-numeric characters.
                     val stripped = numericRegex.replace(it, "")
                     phoneNumber = if (stripped.length >= 10) {
                         stripped.substring(0..9)
@@ -137,22 +136,16 @@ class NanpVisualTransformation : VisualTransformation {
         override fun originalToTransformed(offset: Int): Int =
             when (offset) {
                 0 -> offset
-                // Add 1 for opening parenthesis.
                 in 1..3 -> offset + 1
-                // Add 3 for both parentheses and a space.
                 in 4..6 -> offset + 3
-                // Add 4 for both parentheses, space, and hyphen.
                 else -> offset + 4
             }
 
         override fun transformedToOriginal(offset: Int): Int =
             when (offset) {
                 0 -> offset
-                // Subtract 1 for opening parenthesis.
                 in 1..5 -> offset - 1
-                // Subtract 3 for both parentheses and a space.
                 in 6..10 -> offset - 3
-                // Subtract 4 for both parentheses, space, and hyphen.
                 else -> offset - 4
             }
     }
